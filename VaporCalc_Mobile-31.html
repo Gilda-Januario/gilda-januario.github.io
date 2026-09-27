@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-PT">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0b1f33">
+<title>VaporCalc • Engenharia Química</title>
+<!--
+  VaporCalc • Engenharia Química
+  Autora: Gilda Januário Chigombe
+  Curso: Engenharia Química | 2.º ano
+  Ano de criação: 2026
+  © 2026 Gilda Januário Chigombe. Todos os direitos reservados.
+  Este aviso identifica a autoria desta versão do projeto.
+-->
+<style>
+:root{--navy:#0b1f33;--blue:#145ea8;--ink:#17212b;--muted:#637083;--line:#d9e0e8;--paper:#f5f7fa;--white:#fff;--ok:#176b45;--danger:#a33a35}
+*{box-sizing:border-box} body{margin:0;background:var(--paper);color:var(--ink);font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;line-height:1.45}
+.app{max-width:980px;margin:auto;padding:16px}.hero{background:var(--navy);color:white;border-radius:18px;padding:22px;margin-bottom:14px}.eyebrow{font-size:.78rem;letter-spacing:.12em;text-transform:uppercase;opacity:.72}.hero h1{margin:4px 0;font-size:clamp(1.55rem,5vw,2.2rem)}.hero p{margin:5px 0 0;opacity:.8}
+.tabs{display:flex;gap:6px;overflow:auto;margin-bottom:12px}.tab{border:1px solid var(--line);background:white;padding:10px 14px;border-radius:10px;font-weight:700;white-space:nowrap}.tab.active{background:var(--blue);color:white;border-color:var(--blue)}
+.panel{background:var(--white);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.field label{display:block;font-size:.88rem;font-weight:700;margin-bottom:6px}.field input,.field select{width:100%;min-height:46px;border:1px solid #bcc7d4;border-radius:10px;padding:10px 12px;font-size:1rem;background:white}.field input:focus,.field select:focus,.tab:focus,button:focus{outline:3px solid #9dc8f4;outline-offset:1px}
+button{border:0;border-radius:10px;padding:11px 14px;font-weight:750;font-size:.95rem;cursor:pointer}.primary{background:var(--blue);color:white}.secondary{background:#eaf0f6;color:var(--ink)}.danger{background:#f9e9e8;color:var(--danger)}.actions{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}.result{margin-top:14px;border-left:4px solid var(--blue);background:#f1f6fb;padding:13px;border-radius:8px}.result strong{font-size:1.1rem}.muted{color:var(--muted);font-size:.88rem}.error{color:var(--danger);font-weight:650}.success{color:var(--ok);font-weight:650}
+canvas{width:100%;height:330px;border:1px solid var(--line);border-radius:12px;background:white}.table-wrap{overflow:auto}table{width:100%;border-collapse:collapse;font-size:.9rem}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;white-space:nowrap}th{background:#f2f5f8}.hidden{display:none!important}.note{background:#fff8df;border:1px solid #eadb9e;padding:11px;border-radius:10px;font-size:.9rem}
+@media(max-width:620px){.app{padding:10px}.hero{border-radius:14px;padding:17px}.grid{grid-template-columns:1fr}.panel{padding:13px}.actions button{flex:1 1 45%}canvas{height:270px}}
+</style>
+</head>
+<body>
+<main class="app">
+<header class="hero"><div class="eyebrow">Engenharia Química</div><h1>VaporCalc</h1><p>Pressão de vapor ↔ temperatura, direto no navegador do celular.</p><p style="margin-top:12px;font-size:.86rem;opacity:.9"><strong>Autora:</strong> Gilda Januário Chigombe · 2.º ano · 2026</p></header>
+<nav class="tabs" aria-label="Secções">
+<button class="tab active" data-tab="calc">Cálculos</button><button class="tab" data-tab="graph">Gráfico P × T</button><button class="tab" data-tab="history">Histórico</button>
+</nav>
+<section id="calc" class="tab-panel">
+<div class="panel"><h2>Temperatura → Pressão</h2><div class="grid"><div class="field"><label for="t1">Temperatura</label><input id="t1" type="number" inputmode="decimal" step="any" value="248"></div><div class="field"><label for="tu1">Unidade</label><select id="tu1"><option>K</option><option>°C</option></select></div><div class="field"><label for="pu1">Pressão de saída</label><select id="pu1"><option>mmHg</option><option>kPa</option><option>bar</option><option>atm</option></select></div></div><div class="actions"><button class="primary" id="calcP">Calcular pressão</button><button class="secondary" id="clearP">Limpar</button></div><div id="resP" class="result" aria-live="polite">Introduza uma temperatura e calcule.</div></div>
+<div class="panel"><h2>Pressão → Temperatura</h2><div class="grid"><div class="field"><label for="p2">Pressão</label><input id="p2" type="number" inputmode="decimal" step="any" value="760"></div><div class="field"><label for="pu2">Unidade da pressão</label><select id="pu2"><option>mmHg</option><option>kPa</option><option>bar</option><option>atm</option></select></div><div class="field"><label for="tu2">Temperatura de saída</label><select id="tu2"><option>K</option><option>°C</option></select></div></div><div class="actions"><button class="primary" id="calcT">Calcular temperatura</button><button class="secondary" id="boil">Ponto de ebulição normal</button></div><div id="resT" class="result" aria-live="polite">Introduza uma pressão e calcule.</div></div>
+<div class="panel"><div class="note"><strong>Equação usada</strong><br>log₁₀(P) = 23.686185 − 1691.8057/T − 6.04560·log₁₀(T) + 0.00195754·T<br><span class="muted">P em mmHg e T em K. A inversão P → T usa bisseção numérica.</span></div></div>
+</section>
+<section id="graph" class="tab-panel hidden"><div class="panel"><h2>Curva de pressão de vapor</h2><div class="actions"><button class="primary" id="draw">Atualizar gráfico</button></div><canvas id="chart" width="900" height="500" aria-label="Gráfico de pressão de vapor em função da temperatura"></canvas><p class="muted">Faixa padrão: 195 K até aproximadamente 300 K. Use o gráfico para visualizar a tendência da correlação.</p></div></section>
+<section id="history" class="tab-panel hidden"><div class="panel"><h2>Histórico</h2><div class="actions"><button class="secondary" id="csv">Exportar CSV</button><button class="danger" id="clearH">Apagar histórico</button></div><div class="table-wrap"><table><thead><tr><th>Data/hora</th><th>Operação</th><th>Entrada</th><th>Resultado</th></tr></thead><tbody id="historyBody"></tbody></table></div><p id="empty" class="muted">Ainda não há cálculos.</p></div></section>
+<section class="panel" style="margin-top:12px"><h2>Sobre o VaporCalc</h2><p><strong>Autora:</strong> Gilda Januário Chigombe</p><p><strong>Curso:</strong> Engenharia Química</p><p><strong>Ano:</strong> 2.º ano</p><p><strong>Versão:</strong> 1.0.0 · 2026</p><p class="muted">© 2026 Gilda Januário Chigombe. Todos os direitos reservados. Este projeto e seu código-fonte são apresentados com identificação de autoria.</p></section>
+</main>
+<script>
+const A=23.686185,B=1691.8057,C=6.04560,D=0.00195754;
+const PRESSURE_TO_MMHG={mmHg:1,kPa:7.500616683,bar:750.061683,atm:760};
+const MMHG_TO={mmHg:1,kPa:0.133322368,bar:0.00133322368,atm:1/760};
+const $=id=>document.getElementById(id);
+function pressureMMHg(T){if(!(T>0))throw Error('A temperatura deve ser maior que zero.');return 10**(A-B/T-C*Math.log10(T)+D*T)}
+function temperatureK(P,lo=195,hi=300,tol=1e-8){if(!(P>0))throw Error('A pressão deve ser maior que zero.');const f=t=>pressureMMHg(t)-P;if(f(lo)*f(hi)>0)throw Error('A pressão está fora do intervalo de temperatura 195–300 K.');while(hi-lo>tol){const m=(lo+hi)/2;if(f(lo)*f(m)<=0)hi=m;else lo=m}return (lo+hi)/2}
+function toK(v,u){return u==='K'?v:v+273.15} function fromK(v,u){return u==='K'?v:v-273.15}
+function fmt(v){return Number(v).toLocaleString('pt-PT',{maximumFractionDigits:6})}
+function addHistory(operation,input,result){const h=JSON.parse(localStorage.getItem('vaporcalc_history')||'[]');h.unshift({date:new Date().toLocaleString('pt-PT'),operation,input,result});localStorage.setItem('vaporcalc_history',JSON.stringify(h.slice(0,100)));renderHistory()}
+function renderHistory(){const h=JSON.parse(localStorage.getItem('vaporcalc_history')||'[]');$('historyBody').innerHTML=h.map(x=>`<tr><td>${x.date}</td><td>${x.operation}</td><td>${x.input}</td><td>${x.result}</td></tr>`).join('');$('empty').classList.toggle('hidden',h.length>0)}
+function show(id,html){$(id).innerHTML=html}
+$('calcP').onclick=()=>{try{const raw=Number($('t1').value);if(!Number.isFinite(raw))throw Error('Introduza uma temperatura válida.');const T=toK(raw,$('tu1').value);const P=pressureMMHg(T);const u=$('pu1').value;const out=P*MMHG_TO[u];show('resP',`<strong>${fmt(out)} ${u}</strong><br><span class="muted">T = ${fmt(T)} K</span>`);addHistory('T → P',`${fmt(raw)} ${$('tu1').value}`,`${fmt(out)} ${u}`)}catch(e){show('resP',`<span class="error">${e.message}</span>`)}}
+$('clearP').onclick=()=>{$('t1').value='';show('resP','Introduza uma temperatura e calcule.')}
+$('calcT').onclick=()=>{try{const raw=Number($('p2').value);if(!Number.isFinite(raw)||raw<=0)throw Error('Introduza uma pressão válida.');const u=$('pu2').value;const P=raw*PRESSURE_TO_MMHG[u];const T=temperatureK(P);const out=fromK(T,$('tu2').value);show('resT',`<strong>${fmt(out)} ${$('tu2').value}</strong><br><span class="muted">P = ${fmt(raw)} ${u} • T = ${fmt(T)} K</span>`);addHistory('P → T',`${fmt(raw)} ${u}`,`${fmt(out)} ${$('tu2').value}`)}catch(e){show('resT',`<span class="error">${e.message}</span>`)}}
+$('boil').onclick=()=>{$('p2').value='760';$('pu2').value='mmHg';$('tu2').value='K';$('calcT').click()}
+$('clearH').onclick=()=>{localStorage.removeItem('vaporcalc_history');renderHistory()}
+$('csv').onclick=()=>{const h=JSON.parse(localStorage.getItem('vaporcalc_history')||'[]');if(!h.length)return;const rows=[['Data/hora','Operação','Entrada','Resultado'],...h.map(x=>[x.date,x.operation,x.input,x.result])];const csv='\uFEFF'+rows.map(r=>r.map(v=>'"'+String(v).replaceAll('"','""')+'"').join(';')).join('\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));a.download='vaporcalc_historico.csv';a.click();URL.revokeObjectURL(a.href)}
+function drawChart(){const c=$('chart'),ctx=c.getContext('2d'),w=c.width,h=c.height;ctx.clearRect(0,0,w,h);const pad={l:62,r:18,t:22,b:48},x0=195,x1=300;const pts=[];let ymax=0;for(let i=0;i<=250;i++){const T=x0+(x1-x0)*i/250,P=pressureMMHg(T);pts.push([T,P]);ymax=Math.max(ymax,P)}const y1=Math.ceil(ymax/500)*500;const X=T=>pad.l+(T-x0)/(x1-x0)*(w-pad.l-pad.r),Y=P=>h-pad.b-P/y1*(h-pad.t-pad.b);ctx.strokeStyle='#aeb8c4';ctx.lineWidth=1;ctx.font='13px system-ui';ctx.fillStyle='#4d5966';for(let i=0;i<=5;i++){const y=pad.t+i*(h-pad.t-pad.b)/5;const val=y1*(5-i)/5;ctx.beginPath();ctx.moveTo(pad.l,y);ctx.lineTo(w-pad.r,y);ctx.stroke();ctx.fillText(fmt(val),8,y+4)}for(let i=0;i<=5;i++){const T=x0+i*(x1-x0)/5,x=X(T);ctx.beginPath();ctx.moveTo(x,pad.t);ctx.lineTo(x,h-pad.b);ctx.stroke();ctx.fillText(fmt(T),x-15,h-20)}ctx.strokeStyle='#145ea8';ctx.lineWidth=3;ctx.beginPath();pts.forEach(([T,P],i)=>{const x=X(T),y=Y(P);i?ctx.lineTo(x,y):ctx.moveTo(x,y)});ctx.stroke();ctx.fillStyle='#17212b';ctx.font='700 14px system-ui';ctx.fillText('Pressão de vapor (mmHg)',pad.l,15);ctx.fillText('Temperatura (K)',w/2-55,h-5)}
+$('draw').onclick=drawChart;
+document.querySelectorAll('.tab').forEach(btn=>btn.onclick=()=>{document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));btn.classList.add('active');document.querySelectorAll('.tab-panel').forEach(p=>p.classList.add('hidden'));$(btn.dataset.tab).classList.remove('hidden');if(btn.dataset.tab==='graph')drawChart()});
+renderHistory();
+</script>
+</body>
+</html>
